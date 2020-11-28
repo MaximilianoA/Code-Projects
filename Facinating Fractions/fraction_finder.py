@@ -1,4 +1,4 @@
-# Source:   https://www.youtube.com/watch?v=N92w4e-hrA4&ab_channel=Numberphile
+# Source:   https://www.youtube.com/watch?v=N92w4e-hrA4&ab_channel=Numberphile 
 # Problem:  Find a periodic value set (Z0,c) for the function:
 #           Z -> Z^2 + c
 # Goal:     Ideally we want to find a set with a number of iterations s.t.
@@ -8,10 +8,17 @@
 
 import numpy as np
 from itertools import product
+from math import log
+from math import floor
 import csv
 
-f = lambda z,c: z**2 + c
-ITER_MAX = 30
+f = lambda z,c : z**2 + c
+pow_2 = lambda x : pow(2,x)
+pow_4 = lambda x : pow(4,x)
+log_2 = lambda x : floor(log(x, 2))
+log_4 = lambda x : floor(log(x, 4)) 
+MAX_RANGE = 100
+ITER_MAX = 100
 FILENAME = 'Facinating Fractions/output.txt'
 
 # method to check if a value set is periodic
@@ -32,9 +39,9 @@ def periodic(z, c):
                 break
             # z0 will always be squared in the first pass through
             # thus z0 and -z0 have the same sequence
-            elif -z==z0:
+            elif z==-z0:
                 periodic = True
-                z0 = -z
+                z0 = -z0
                 break
         except OverflowError:
             break
@@ -67,17 +74,32 @@ def main():
     out_file = open(FILENAME, 'w')
 
     print('======== Searching')
-    # Theory: in order for the function to be periodic it
-    #         must either converge or oscilate
+    # From observation of previous output we see that the only
+    # fractions which are successful are those where z has a 
+    # denominator that is a power of two, and c has a denominator
+    # with a power of 4
+    # TODO: Search irrational numbers
+    
+    # for zd,zn in product(range(1, MAX_RANGE), range(MAX_RANGE)):
+    for zd,zn in product(
+        map(pow_2, range(1, log_2(MAX_RANGE)+1)),
+        range(1, MAX_RANGE, 2)
+        ):
+        # print('z:',zn,'/',zd)
 
-    for zn,zd in product(range(30), range(1, 30)):
         z = zn/zd
         # check if value would have been previously examined
         _,d_min = float.as_integer_ratio(z)
         if zd!=d_min:
             continue
         
-        for cn,cd in product(range(30), range(1,30)):
+        # for cd,cn in product(range(1, MAX_RANGE), range(MAX_RANGE)):
+        for cd,cn in product(
+            map(pow_4, range(1, log_4(MAX_RANGE)+1)),
+            range(1, MAX_RANGE, 2)
+            ):
+            # print('c:',cn,'/',cd)
+
             c = cn/cd
             # check if value would have been previously examined
             _,d_min = float.as_integer_ratio(c)
@@ -91,7 +113,7 @@ def main():
             #   c <= Z - Z^2
             #       if we plot y = x - x^2 we see that
             #       c <= 1/4 (see test 2)
-            if c>0 and c<1/4:
+            if c>0 and c<=1/4:
                 z0, i = periodic(z,c)
                 if i>0:
                     out_file.write('Z = ' + simplify(z0))

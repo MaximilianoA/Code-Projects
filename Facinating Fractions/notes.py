@@ -4,4 +4,4 @@ print(b)
 
 file_writer = open("Facinating Fractions/output.txt", 'w')
 file_writer.write('new')
-file_writer.close()
+file_writer.close() 
