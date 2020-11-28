@@ -8,24 +8,25 @@
 
 import numpy as np
 from itertools import product
+import csv
 
 f = lambda z,c: z**2 + c
 ITER_MAX = 30
+FILENAME = 'Facinating Fractions/output.txt'
 
-# method to find number of iterations i
+# method to check if a value set is periodic
 # if i reaches ITTER_MAX assume non-periodic
-# @return: weather or not these values are periodic
+# @return: number of iterations i (-1 if non-periodic),
+#          and z0 (in case of negative)
 # @param: z and c MUST be of type float
-# TODO: instead of ITER_MAX make terminating conditions
-# TODO: instead of printing to console write to file
-def check_if_periodic(z, c, view=False):
+def periodic(z, c):
+    # TODO: instead of ITER_MAX make terminating conditions
+    # TODO: instead of printing to console write to file
     z0 = z
     periodic = False
     for i in range(1, ITER_MAX):
         try:
             z = f(z, c)
-            if view:
-                print(simplify(z))
             if z==z0:
                 periodic = True
                 break
@@ -37,13 +38,9 @@ def check_if_periodic(z, c, view=False):
                 break
         except OverflowError:
             break
-    if periodic:
-        print('Z =', simplify(z0))
-        print('c =', simplify(c))
-        print('i =', i, '\n')
-    elif view:
-        print('non-periodic\n')
-    return periodic
+    if not periodic:
+        i = -1
+    return z0, i
 
 # @param: accepts a float 'x'
 # @return: returns that float in the most readable format
@@ -60,45 +57,55 @@ def simplify(x):
 # some simple test cases
 def test():
     print('======== Periodic Examples:')
-    check_if_periodic(0.0,0.0)       # eo: i=1
-    check_if_periodic(1/2, 1/4)      # eo: i=1
-    check_if_periodic(0.0, -1.0)     # eo: i=2
-    check_if_periodic(-7/4, -29/16)  # eo: i=3
-    check_if_periodic(1.0, 1.0)      # eo: non-periodic
+    periodic(0.0,0.0)       # eo: i=1
+    periodic(1/2, 1/4)      # eo: i=1
+    periodic(0.0, -1.0)     # eo: i=2
+    periodic(-7/4, -29/16)  # eo: i=3
+    periodic(1.0, 1.0)      # eo: non-periodic
 
 def main():
+    out_file = open(FILENAME, 'w')
+
     print('======== Searching')
     # Theory: in order for the function to be periodic it
     #         must either converge or oscilate
 
-    # for each possible z
     for zn,zd in product(range(30), range(1, 30)):
         z = zn/zd
-
         # check if value would have been previously examined
         _,d_min = float.as_integer_ratio(z)
         if zd!=d_min:
             continue
         
-        # for each possible c
         for cn,cd in product(range(30), range(1,30)):
             c = cn/cd
-
             # check if value would have been previously examined
             _,d_min = float.as_integer_ratio(c)
             if cd!=d_min:
                 continue
-
+            
+            # Positive values
             # obviously Z^2 >= 0 t.f.
             # if c > 0 then Z^2 + c > 0 t.f.
             #   Z^2 + c <= Z (or f(x) will grow exponentially)
             #   c <= Z - Z^2
             #       if we plot y = x - x^2 we see that
             #       c <= 1/4 (see test 2)
-            if c < 1/4:
-                check_if_periodic(z,c)
+            if c>0 and c<1/4:
+                z0, i = periodic(z,c)
+                if i>0:
+                    out_file.write('Z = ' + simplify(z0))
+                    out_file.write('\nc = ' + simplify(c))
+                    out_file.write('\ni = ' + str(i) + '\n\n')
             
-
+            # Negative values
+            c = -c
+            z0, i = periodic(z,c)
+            if i>0:
+                out_file.write('Z = ' + simplify(z0))
+                out_file.write('\nc = ' + simplify(c))
+                out_file.write('\ni = ' + str(i) + '\n\n')
+    out_file.close()
 
 if __name__ == '__main__':
     main()
