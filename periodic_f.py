@@ -17,13 +17,17 @@ ITER_MAX = 30
 # @param: z and c MUST be of type float
 def test_if_periodic(z, c, view=False):
     z0 = z
+    z_prev = z
     periodic = False
     for i in range(1, ITER_MAX):
-        z = f(z, c)
-        if view:
-            print(z)
-        if z==z0:
-            periodic = True
+        try:
+            z = f(z, c)
+            if view:
+                print(z)
+            if z==z0:
+                periodic = True
+                break
+        except OverflowError:
             break
     if periodic:
         print(
@@ -40,4 +44,4 @@ test_if_periodic(0.0,0.0)       # eo: i=1
 test_if_periodic(1/2, 1/4)      # eo: i=1
 test_if_periodic(0.0, -1.0)     # eo: i=2
 test_if_periodic(-7/4, -29/16)  # eo: i=3
-# test_if_periodic(1.0, 1.0)      # eo: non-periodic
+test_if_periodic(1.0, 1.0)      # eo: non-periodic
