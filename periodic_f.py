@@ -28,9 +28,16 @@ def test_if_periodic(z, c, view=False):
     if periodic:
         print(
             'Z =', z0,
-            'c =', c,
-            'i =', i, 
+            '\tc =', c,
+            '\ti =', i, 
             )
     else:
         print('non-periodic')
     return periodic
+
+# TEST
+test_if_periodic(0.0,0.0)       # eo: i=1
+test_if_periodic(1/2, 1/4)      # eo: i=1
+test_if_periodic(0.0, -1.0)     # eo: i=2
+test_if_periodic(-7/4, -29/16)  # eo: i=3
+# test_if_periodic(1.0, 1.0)      # eo: non-periodic
