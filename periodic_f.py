@@ -17,13 +17,12 @@ ITER_MAX = 30
 # @param: z and c MUST be of type float
 def test_if_periodic(z, c, view=False):
     z0 = z
-    z_prev = z
     periodic = False
     for i in range(1, ITER_MAX):
         try:
             z = f(z, c)
             if view:
-                print(z)
+                print(simplify(z))
             if z==z0:
                 periodic = True
                 break
@@ -31,13 +30,22 @@ def test_if_periodic(z, c, view=False):
             break
     if periodic:
         print(
-            'Z =', z0,
-            '\tc =', c,
+            'Z =', simplify(z0),
+            '\tc =', simplify(c),
             '\ti =', i, 
             )
     else:
         print('non-periodic')
     return periodic
+
+def simplify(x):
+    x_str = ''
+    if float.is_integer(x):
+        x_str = str(x)
+    else:
+        a,b = float.as_integer_ratio(x)
+        x_str = str(a) + '/' + str(b)
+    return x_str
 
 # TEST
 test_if_periodic(0.0,0.0)       # eo: i=1
