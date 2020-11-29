@@ -33,12 +33,13 @@ def place_n_queens(n):
     board = np.empty(0, int)
     solns = []
     recursive_place_queens(n, 0, board, solns)
-    remove_variations(solns, n)
+    # remove_variations(solns, n)
     draw_solns(solns, n)
 
 
 # remove soln's that are rotations/reflections
 # of one another
+# TODO
 def remove_variations(solns, n):
     
     for i in range(len(solns)):
@@ -188,4 +189,4 @@ def draw_solns(solns, n):
 
 
 if __name__ == "__main__":
-    place_n_queens(8)
+    place_n_queens(5)
