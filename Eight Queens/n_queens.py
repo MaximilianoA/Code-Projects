@@ -4,9 +4,10 @@
 # Goal:     find all possible soln's and quickly
 #           use effective backtracking algorithm
 
-import numpy as np
 from PIL import Image, ImageDraw
+import numpy as np
 
+# TODO: check if dir exists and if not create it
 DIR = 'Eight Queens/Solutions'
 DIM = 600
 
@@ -29,10 +30,64 @@ def recursive_place_queens(n, row, board, result):
 # public method to begin recursive search for solutions
 # only requires one parameter, n
 def place_n_queens(n):
-    board = np.array([])
-    result = []
-    recursive_place_queens(n, 0, board, result)
-    draw_solns(result, n)
+    board = np.empty(0, int)
+    solns = []
+    recursive_place_queens(n, 0, board, solns)
+    remove_variations(solns, n)
+    draw_solns(solns, n)
+
+
+# remove soln's that are rotations/reflections
+# of one another
+def remove_variations(solns, n):
+    
+    for i in range(len(solns)):
+        try:
+            var = []
+            board = solns[i].copy()
+            temp = solns[i].copy()
+        except IndexError:
+            break
+
+        # Rotations
+        for _ in range(3):
+            temp = rotate(temp)
+            if (temp!=board).all():
+                board = temp.copy()
+                var.append(board)
+
+        # Reflections:
+        board = solns[i].copy()
+        temp = reflect(solns[i])
+        if (temp!=board).all():
+            board = temp.copy()
+            var.append(board)
+        for _ in range(3):
+            temp = rotate(temp)
+            if (temp!=board).all():
+                board = temp.copy()
+                var.append(board)
+
+        # remove variations
+        for v in range(len(var)):
+            for s in range(len(solns[i:])):
+                if (solns[s]==var[v]).all():
+                    solns.pop(s)
+                    break
+
+
+def rotate(board):
+    n = len(board)
+    result = np.zeros(n, int)
+    for i in range(n):
+        row = int(board[i])
+        col = (n-1) - i
+        result[row] = col
+    return result
+
+
+def reflect(board):
+    return np.flip(board)
 
 
 # our algorithm naturally asserts that queens occupy different rows
@@ -40,21 +95,23 @@ def place_n_queens(n):
 # and diagonals
 # @return: returns a boolean
 def is_valid(board, n):
-    length = len(board)
+    m = len(board)
 
     # check columns
-    if len(np.unique(board)) != length:
+    if len(np.unique(board)) != m:
         return False
 
     # check diagonals
-    d_1 = np.zeros(length)
-    d_2 = np.zeros(length)
-    for i in range(length):
-        d_1[i] = board[i] - i
-        d_2[i] = board[i] - (n - 1) + i
-    if len(np.unique(d_1)) != length:
+    d_1 = np.zeros(m)
+    d_2 = np.zeros(m)
+    for i in range(m):
+        col = board[i]
+        row = i
+        d_1[i] = col - row
+        d_2[i] = col + row - (n-1)
+    if len(np.unique(d_1)) != m:
         return False
-    if len(np.unique(d_2)) != length:
+    if len(np.unique(d_2)) != m:
         return False
     return True
 
