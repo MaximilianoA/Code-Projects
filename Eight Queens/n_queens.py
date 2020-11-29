@@ -21,7 +21,7 @@ def recursive_place_queens(n, row, board, result):
     else:
         for col in range(n):
             board = np.append(board, col)
-            if is_valid(board):
+            if is_valid(board, n):
                 recursive_place_queens(n, row + 1, board, result)
             board = np.delete(board, -1)
 
@@ -39,16 +39,22 @@ def place_n_queens(n):
 # this method additionally checks that they occupy different columns
 # and diagonals
 # @return: returns a boolean
-def is_valid(board):
-    rows = len(board)
+def is_valid(board, n):
+    length = len(board)
+
     # check columns
-    if len(np.unique(board)) != rows:
+    if len(np.unique(board)) != length:
         return False
+
     # check diagonals
-    offsets = np.zeros(rows)
-    for i in range(rows):
-        offsets[i] = board[i] - i
-    if len(np.unique(offsets)) != rows:
+    d_1 = np.zeros(length)
+    d_2 = np.zeros(length)
+    for i in range(length):
+        d_1[i] = board[i] - i
+        d_2[i] = board[i] - (n - 1) + i
+    if len(np.unique(d_1)) != length:
+        return False
+    if len(np.unique(d_2)) != length:
         return False
     return True
 
@@ -125,4 +131,4 @@ def draw_solns(solns, n):
 
 
 if __name__ == "__main__":
-    place_n_queens(4)
+    place_n_queens(8)
